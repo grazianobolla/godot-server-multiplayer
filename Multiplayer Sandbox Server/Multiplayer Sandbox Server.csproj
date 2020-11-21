@@ -1,6 +1,6 @@
 <Project Sdk="Godot.NET.Sdk/3.2.3">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net500</TargetFramework>
     <RootNamespace>MultiplayerSandboxServer</RootNamespace>
   </PropertyGroup>
 </Project>

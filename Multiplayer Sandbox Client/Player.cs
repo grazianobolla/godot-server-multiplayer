@@ -4,11 +4,12 @@ using System;
 //handles movement both for the local client and the dummies
 public class Player : KinematicBody2D
 {
-	[Export] float speed = 6;
+	[Export] float speed = 250;
 	[Export] float net_interpolation_speed = 20;
 
-	Server server; //server singleton
 	public Vector2 received_net_pos; //last position received from the server
+
+	Server server; //server singleton
 
 	public override void _Ready()
 	{
@@ -17,6 +18,7 @@ public class Player : KinematicBody2D
 
 	public override void _PhysicsProcess(float delta)
 	{
+		//if its a dummy
 		if(IsNetworkMaster() == false){
 			//interpolates the positions to get a smoother gameplay
 			Position = Position.LinearInterpolate(received_net_pos, delta * net_interpolation_speed);
@@ -24,12 +26,15 @@ public class Player : KinematicBody2D
 		}
 
 		//very simple input
-		if(Input.IsActionPressed("ui_right")) Translate(Vector2.Right * delta * speed);
-		else if(Input.IsActionPressed("ui_left")) Translate(Vector2.Left * delta * speed);
+		Vector2 direction = Vector2.Zero;
+		if(Input.IsActionPressed("ui_right")) direction.x = 1;
+		else if(Input.IsActionPressed("ui_left")) direction.x = -1;
+		if(Input.IsActionPressed("ui_up")) direction.y = -1;
+		else if(Input.IsActionPressed("ui_down")) direction.y = 1;
+		direction = direction.Normalized();
 
-		if(Input.IsActionPressed("ui_up")) Translate(Vector2.Up * delta * speed);
-		else if(Input.IsActionPressed("ui_down")) Translate(Vector2.Down * delta * speed);
-		
+		MoveAndCollide(direction * speed); //internally calls delta
+
 		server.SendClientPosition(Position);
 	}
 

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class Game : Node
 {
-	//dictionary of stored players as id : nodepath
-	Dictionary<int, string> clients = new Dictionary<int, string>();
+	//dictionary of stored players as id : instance_id
+	Dictionary<int, ulong> dummy_clients = new Dictionary<int, ulong>();
 
 	//adds a player model to the scene
 	public void AddModel(int id, string name, Vector2 position){
@@ -22,19 +22,19 @@ public class Game : Node
 		GetTree().Root.GetNode("Scene/Clients").AddChild(player);
 
 		//add player to dictionary
-		clients.Add(id, player.GetPath());
+		dummy_clients.Add(id, player.GetInstanceId());
 		GD.Print($"Registered player {id} path {player.GetPath()}");
 	}
 
 	//returns the player from the dictionary based on id (its a macro)
 	Player GetModel(int id){
-		return (Player)GetNode(clients[id]);
+		return (Player)GD.InstanceFromId(dummy_clients[id]);
 	}
 
 	//deletes a player
 	public void DeleteModel(int id){
 		GetModel(id).QueueFree();
-		clients.Remove(id);
+		dummy_clients.Remove(id);
 	}
 
 	//updates position value on a dummy

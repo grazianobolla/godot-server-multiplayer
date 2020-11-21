@@ -1,5 +1,30 @@
-[gd_scene format=2]
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Lobby.cs" type="Script" id=1]
 
 [node name="Scene" type="Node2D"]
 
 [node name="Clients" type="Node" parent="."]
+
+[node name="Control" type="Control" parent="."]
+margin_right = 700.0
+margin_bottom = 400.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UsernameInput" type="LineEdit" parent="Control"]
+margin_right = 112.0
+margin_bottom = 24.0
+placeholder_text = "username"
+
+[node name="ConnectButton" type="Button" parent="Control"]
+margin_left = 117.0
+margin_right = 187.0
+margin_bottom = 24.0
+text = "Connect"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="Control/ConnectButton" to="Control" method="onConnectButtonPressed"]

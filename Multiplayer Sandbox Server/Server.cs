@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 
 //data that the server its gonna track
-struct ClientData{
+struct Client {
 	public string name;
 	public Vector2 position;
 
-	public void ChangePos(Vector2 pos){
+	public void UpdatePosition(Vector2 pos){
 		position = pos;
 	}
 }
@@ -15,7 +15,7 @@ struct ClientData{
 public class Server : Node
 {
 	//player id/data dictionary
-	Dictionary<int, ClientData> clients = new Dictionary<int, ClientData>();
+	Dictionary<int, Client> clients = new Dictionary<int, Client>();
 
 	public override void _Ready()
 	{
@@ -33,30 +33,14 @@ public class Server : Node
 
 	//called when a client connects the server
 	void onNetworkClientConnect(int connected_client_id){
-		//define new connected client
-		ClientData data = new ClientData();
-		data.name = connected_client_id.ToString();
-		data.position = new Vector2(100, 100); //TODO: change spawn point 
-
-		//spawn the client on all already connected clients
-		foreach (int id in clients.Keys){
-			RpcId(id, "SpawnDummy", connected_client_id, data.name, data.position);
-		}
-		
-		RpcId(connected_client_id, "Spawn", data.name, data.position);
-
-		//spawn connected clients on his side
-		foreach (var item in clients){
-			RpcId(connected_client_id, "SpawnDummy", item.Key, item.Value.name, item.Value.position);
-		}
-
-		clients.Add(connected_client_id, data);
+		GD.Print($"Client {connected_client_id} connected");
 	}
 
 	//called when a client disconnects
 	void onNetworkClientDisconnect(int disconnected_client_id){
 		//send delete call on all clients
-		foreach (int id in clients.Keys){
+		foreach (int id in clients.Keys)
+		{
 			if(disconnected_client_id != id) RpcId(id, "DeleteDummy", disconnected_client_id);	
 		}
 
@@ -64,14 +48,38 @@ public class Server : Node
 		GD.Print($"Client {disconnected_client_id} disconnected!");
 	}
 
-	[Remote] void UpdateClientPosition(Vector2 new_position){
-		int sender_id = GetTree().GetRpcSenderId();
-		clients[sender_id].ChangePos(new_position);
+	[Remote] void UpdateClientPosition(int sender_id, Vector2 new_position){
+		clients[sender_id].UpdatePosition(new_position);
 		
-		foreach (int id in clients.Keys){
-			if(sender_id != id){
-				RpcUnreliableId(id, "UpdateDummyPosition", sender_id, new_position);
-			}
+		foreach (int id in clients.Keys)
+		{
+			if(id != sender_id) RpcUnreliableId(id, "UpdateDummyPosition", sender_id, new_position);
 		}
+	}
+
+	[Remote] void StartClient(int client_id, string name){
+		GD.Print($"Client {client_id} ({name}) requested start");
+
+		//define new connected client
+		Client new_client = new Client();
+
+		new_client.name = name;
+		new_client.position = new Vector2(350, 200);
+
+		//spawn the client on all already connected clients
+		foreach (int id in clients.Keys)
+		{
+			RpcId(id, "SpawnDummy", client_id, new_client.name, new_client.position);
+		}
+		
+		RpcId(client_id, "Spawn", new_client.name, new_client.position);
+
+		//spawn connected clients on his side
+		foreach (var item in clients)
+		{
+			RpcId(client_id, "SpawnDummy", item.Key, item.Value.name, item.Value.position);
+		}
+
+		clients.Add(client_id, new_client); //add to the server dictionary
 	}
 }

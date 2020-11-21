@@ -14,13 +14,10 @@ public class Server : Node
 		//client godot-api signals
 		GetTree().Connect("connected_to_server", this, "onConnection");
 		GetTree().Connect("connection_failed", this, "onConnectionFailed");
-	
-		//address and port, could be changed, not doing it here, this is just an example
-		ConnectClient("localhost", 3074);
 	}
 
 	//creates a peer and attempts to connect a server
-	void ConnectClient(string address, int port){
+	public void ConnectClient(string address, int port){
 		NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
 		peer.CreateClient(address, port);
 		GetTree().NetworkPeer = peer;
@@ -44,7 +41,7 @@ public class Server : Node
 		game_singleton.AddModel(unique_id, name, position);
 	}
 
-	//spawns a 'dummy' player
+	//spawns a dummy player
 	[Remote] void SpawnDummy(int id, string name, Vector2 position){
 		GD.Print($"SpawnDummy() id {id}, name {name}, position {position}");
 		game_singleton.AddModel(id, name, position);
@@ -63,6 +60,10 @@ public class Server : Node
 
 	//used for sending updates of our position to the server
 	public void SendClientPosition(Vector2 position){
-		RpcUnreliableId(1, "UpdateClientPosition", position);
+		RpcUnreliableId(1, "UpdateClientPosition", unique_id, position);
+	}
+
+	public void RequestStart(string name){
+		RpcId(1, "StartClient", unique_id, name);
 	}
 }
