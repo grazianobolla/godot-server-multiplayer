@@ -6,6 +6,10 @@ using System.Collections.Generic;
 struct ClientData{
 	public string name;
 	public Vector2 position;
+
+	public void ChangePos(Vector2 pos){
+		position = pos;
+	}
 }
 
 public class Server : Node
@@ -60,9 +64,14 @@ public class Server : Node
 		GD.Print($"Client {disconnected_client_id} disconnected!");
 	}
 
-	[Remote] void UpdateClientPosition(int sender_id, Vector3 new_position){
-		foreach (var client in clients){
-			if(sender_id != client.Key) RpcUnreliableId(client.Key, "UpdateDummyPosition", sender_id, new_position);	
+	[Remote] void UpdateClientPosition(Vector2 new_position){
+		int sender_id = GetTree().GetRpcSenderId();
+		clients[sender_id].ChangePos(new_position);
+		
+		foreach (int id in clients.Keys){
+			if(sender_id != id){
+				RpcUnreliableId(id, "UpdateDummyPosition", sender_id, new_position);
+			}
 		}
 	}
 }
