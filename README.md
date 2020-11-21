@@ -6,9 +6,9 @@ This example demonstrates how to implement a client-server architecture in godot
 
 ## Client Server Architecture
 Normally Godot multiplayer examples show a Peer to Peer architecture, where all clients are interconnected, and where they can freely communicate with each other, for me its easier to implement and prototype, but also this in general and specially in godot is a mess, there are some other drawbacks like:
-- Security is hard to achieve.
-- A client having a bad internet connection might affect other clients.
-- Latency is greater.
+- Security is hard to achieve
+- A client having a bad internet connection might affect other clients
+- Latency is greater
 - May require port forwarding
 
 ### Client-Server
