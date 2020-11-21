@@ -19,5 +19,4 @@ To solve some of those problems a client-server architecture is needed, where th
 ### This implementation
 This implementation of the Client-Server architecture isn't ideal, it works ok but the clients are doing too much, remember that in a Server based architecture the client is just a representation of some server value, for example one improvement would be to do all the physics on the server, and just send the results to the client, but for a simple party game, or like in this case, an example, its fine.
 
-#### Contact on Discord
-Raz#4584
+#### Contact on Discord Raz#4584
