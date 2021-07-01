@@ -27,4 +27,5 @@ text = "Connect"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="pressed" from="Control/ConnectButton" to="Control" method="onConnectButtonPressed"]

@@ -3,83 +3,98 @@ using System;
 using System.Collections.Generic;
 
 //data that the server its gonna track
-struct Client {
-	public string name;
-	public Vector2 position;
+struct ClientData
+{
+    public string name;
+    public Vector2 position;
 
-	public void UpdatePosition(Vector2 pos){
-		position = pos;
-	}
-}
+    public void SetPos(Vector2 new_position)
+    {
+        position = new_position;
+    }
+};
 
 public class Server : Node
 {
-	//player id/data dictionary
-	Dictionary<int, Client> clients = new Dictionary<int, Client>();
+    //player id/data dictionary
+    Dictionary<int, ClientData> clients = new Dictionary<int, ClientData>();
 
-	public override void _Ready()
-	{
-		CreateServer();
-		GetTree().Connect("network_peer_connected", this, "onNetworkClientConnect");
-		GetTree().Connect("network_peer_disconnected", this, "onNetworkClientDisconnect");
-	}
+    [Export] int server_port = 3074;
+    [Export] int max_players = 6;
 
-	void CreateServer(){
-		NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
-		peer.CreateServer(3074, 6);
-		GetTree().NetworkPeer = peer;
-		GD.Print("Server listening on 3074");
-	}
+    public override void _Ready()
+    {
+        CreateServer();
+        GetTree().Connect("network_peer_connected", this, "onNetworkClientConnect");
+        GetTree().Connect("network_peer_disconnected", this, "onNetworkClientDisconnect");
+    }
 
-	//called when a client connects the server
-	void onNetworkClientConnect(int connected_client_id){
-		GD.Print($"Client {connected_client_id} connected");
-	}
+    private void CreateServer()
+    {
+        NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
+        peer.CreateServer(server_port, max_players);
+        GetTree().NetworkPeer = peer;
+        GD.Print("Server listening on 3074");
+    }
 
-	//called when a client disconnects
-	void onNetworkClientDisconnect(int disconnected_client_id){
-		//send delete call on all clients
-		foreach (int id in clients.Keys)
-		{
-			if(disconnected_client_id != id) RpcId(id, "DeleteDummy", disconnected_client_id);	
-		}
+    //called when a client connects the server
+    private void onNetworkClientConnect(int connected_client_id)
+    {
+        GD.Print($"Client {connected_client_id} connected");
+    }
 
-		clients.Remove(disconnected_client_id);
-		GD.Print($"Client {disconnected_client_id} disconnected!");
-	}
+    //called when a client disconnects
+    private void onNetworkClientDisconnect(int disconnected_client_id)
+    {
+        //send delete call on all clients
+        foreach (int id in clients.Keys)
+        {
+            if (disconnected_client_id != id)
+                RpcId(id, "DeleteDummy", disconnected_client_id);
+        }
 
-	[Remote] void UpdateClientPosition(int sender_id, Vector2 new_position){
-		clients[sender_id].UpdatePosition(new_position);
-		
-		foreach (int id in clients.Keys)
-		{
-			if(id != sender_id) RpcUnreliableId(id, "UpdateDummyPosition", sender_id, new_position);
-		}
-	}
+        clients.Remove(disconnected_client_id);
+        GD.Print($"Client {disconnected_client_id} disconnected!");
+    }
 
-	[Remote] void StartClient(int client_id, string name){
-		GD.Print($"Client {client_id} ({name}) requested start");
+    [Remote]
+    private void UpdateClientPosition(int sender_id, Vector2 new_position)
+    {
+        clients[sender_id].SetPos(new_position);
 
-		//define new connected client
-		Client new_client = new Client();
+        foreach (int id in clients.Keys)
+        {
+            if (id != sender_id)
+                RpcUnreliableId(id, "UpdateDummyPosition", sender_id, new_position);
+        }
+    }
 
-		new_client.name = name;
-		new_client.position = new Vector2(350, 200);
+    [Remote]
+    private void StartClient(int client_id, string name)
+    {
+        GD.Print($"Client {client_id} ({name}) requested start");
 
-		//spawn the client on all already connected clients
-		foreach (int id in clients.Keys)
-		{
-			RpcId(id, "SpawnDummy", client_id, new_client.name, new_client.position);
-		}
-		
-		RpcId(client_id, "Spawn", new_client.name, new_client.position);
+        //define new connected client
+        ClientData new_client = new ClientData
+        {
+            name = name,
+            position = new Vector2(350, 200) //defines spawn position, do n
+        };
 
-		//spawn connected clients on his side
-		foreach (var item in clients)
-		{
-			RpcId(client_id, "SpawnDummy", item.Key, item.Value.name, item.Value.position);
-		}
+        //spawn the client on all already connected clients
+        foreach (int id in clients.Keys)
+        {
+            RpcId(id, "SpawnDummy", client_id, new_client.name, new_client.position);
+        }
 
-		clients.Add(client_id, new_client); //add to the server dictionary
-	}
-}
+        RpcId(client_id, "Spawn", new_client.name, new_client.position);
+
+        //spawn connected clients on his side
+        foreach (var item in clients)
+        {
+            RpcId(client_id, "SpawnDummy", item.Key, item.Value.name, item.Value.position);
+        }
+
+        clients.Add(client_id, new_client); //add to the server dictionary
+    }
+};
