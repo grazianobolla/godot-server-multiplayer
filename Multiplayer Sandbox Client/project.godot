@@ -20,7 +20,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Server="*res://Server.cs"
+Network="*res://Network.cs"
 Game="*res://Game.cs"
 
 [display]

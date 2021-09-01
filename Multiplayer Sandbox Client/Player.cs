@@ -4,44 +4,65 @@ using System;
 //handles movement both for the local client and the dummies
 public class Player : KinematicBody2D
 {
-    Server server; //server singleton
-
-    [Export] float speed = 250;
-    [Export] float net_interpolation_speed = 20;
+    Network network;
 
     public Vector2 received_net_pos; //last position received from the server
 
+    private const float net_interpolation_speed = 20;
+    private const float net_rate_hz = 60;
+    private float net_cooldown = 0;
+    private float last_input_data = -1;
+
     public override void _Ready()
     {
-        server = (Server)GetNode("/root/Server");
+        network = (Network)GetNode("/root/Network");
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _Process(float delta)
     {
-        //if its a dummy
+        //interpolates to the last server received position for a smoother movement
+        Position = Position.LinearInterpolate(received_net_pos, delta * net_interpolation_speed);
+
         if (IsNetworkMaster() == false)
+            return;
+
+
+        if(net_cooldown < 1.0f / net_rate_hz)
         {
-            //interpolates the positions to get a smoother gameplay
-            Position = Position.LinearInterpolate(received_net_pos, delta * net_interpolation_speed);
+            net_cooldown += delta;
             return;
         }
+        else net_cooldown = 0;
 
-        //very simple input, you should do movement calculations on the server, not here!
-        Vector2 direction = Vector2.Zero;
-        if (Input.IsActionPressed("ui_right")) direction.x = 1;
-        else if (Input.IsActionPressed("ui_left")) direction.x = -1;
-        if (Input.IsActionPressed("ui_up")) direction.y = -1;
-        else if (Input.IsActionPressed("ui_down")) direction.y = 1;
-        direction = direction.Normalized();
+        int input = ReadInput();
 
-        MoveAndCollide(direction * speed); //internally calls delta
+        if(input != last_input_data)
+            network.SendClientMovementInstructions(input);
 
-        //you may want to not send on every tick, but its fine, maybe create a separate thread for this
-        server.SendClientPosition(Position);
+        last_input_data = input;
     }
 
     public void ChangeName(string name)
     {
         GetNode<Label>("Sprite/UsernameLabel").Text = name;
+    }
+
+    private int ReadInput()
+    {
+        int input_data = -1;
+
+        if (Input.IsActionPressed("ui_right"))
+            input_data = 0;
+
+        else if (Input.IsActionPressed("ui_left"))
+            input_data = 1;
+
+        if (Input.IsActionPressed("ui_up"))
+            input_data = 2;
+
+        else if (Input.IsActionPressed("ui_down"))
+            input_data = 3;
+
+        return input_data;
     }
 }

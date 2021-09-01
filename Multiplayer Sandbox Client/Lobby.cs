@@ -3,25 +3,25 @@ using System;
 
 public class Lobby : Control
 {
-    Server server;
+    Network network;
     LineEdit username_input;
 
     public override void _Ready()
     {
-        server = GetNode<Server>("/root/Server");
+        network = GetNode<Network>("/root/Network");
         username_input = GetNode<LineEdit>("UsernameInput");
 
-        GetTree().Connect("connected_to_server", this, "onConnection");
+        GetTree().Connect("connected_to_server", this, "OnConnection");
     }
 
     private void onConnectButtonPressed()
     {
-        server.ConnectClient("localhost", 3074); //you can change this
+        network.ConnectClient("localhost", 3074); //you can change this
     }
 
-    private void onConnection()
+    private void OnConnection()
     {
-        server.RequestStart(username_input.Text);
+        network.RequestStart(username_input.Text);
         Hide();
     }
 }

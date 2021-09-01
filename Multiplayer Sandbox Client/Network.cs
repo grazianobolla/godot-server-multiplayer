@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 //networking class, has to be the same name as the one in the server
-public class Server : Node
+public class Network : Node
 {
     Game game_singleton;
     int unique_id;
@@ -13,37 +13,38 @@ public class Server : Node
         game_singleton = GetNode<Game>("/root/Game");
 
         //client godot-api signals
-        GetTree().Connect("connected_to_server", this, "onConnection");
-        GetTree().Connect("connection_failed", this, "onConnectionFailed");
+        GetTree().Connect("connected_to_server", this, "OnConnection");
+        GetTree().Connect("connection_failed", this, "OnConnectionFailed");
     }
 
     //creates a peer and attempts to connect a server
     public void ConnectClient(string address, int port)
     {
         NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
+        peer.CompressionMode = NetworkedMultiplayerENet.CompressionModeEnum.Zlib;
         peer.CreateClient(address, port);
         GetTree().NetworkPeer = peer;
-        GD.Print($"Connecting to server {address}:{port}");
+        GD.Print($"connecting to server {address}:{port}");
     }
 
     //called on connection success
-    private void onConnection()
+    private void OnConnection()
     {
-        GD.Print("Connected to server!");
+        GD.Print("connected to server!");
         unique_id = GetTree().GetNetworkUniqueId();
     }
 
     //called on connection fail
-    private void onConnectionFailed()
+    private void OnConnectionFailed()
     {
-        GD.Print("Couldn't connect server!");
+        GD.Print("couldn't connect server!");
     }
 
     //spawns the player
     [Remote]
     private void Spawn(string name, Vector2 position)
     {
-        GD.Print($"Spawn() name {name}, position {position}");
+        GD.Print($"spawning player name {name}, position {position}");
         game_singleton.AddModel(unique_id, name, position);
     }
 
@@ -51,7 +52,7 @@ public class Server : Node
     [Remote]
     private void SpawnDummy(int id, string name, Vector2 position)
     {
-        GD.Print($"SpawnDummy() id {id}, name {name}, position {position}");
+        GD.Print($"spawning dummy id {id}, name {name}, position {position}");
         game_singleton.AddModel(id, name, position);
     }
 
@@ -59,7 +60,7 @@ public class Server : Node
     [Remote]
     private void DeleteDummy(int id)
     {
-        GD.Print($"DeleteDummy() id {id}");
+        GD.Print($"removing dummy id {id}");
         game_singleton.DeleteModel(id);
     }
 
@@ -70,10 +71,10 @@ public class Server : Node
         game_singleton.MoveModel(id, new_position);
     }
 
-    //used for sending updates of our position to the server
-    public void SendClientPosition(Vector2 position)
+    //used to send player instructions to the server
+    public void SendClientMovementInstructions(int instruction)
     {
-        RpcUnreliableId(1, "UpdateClientPosition", unique_id, position);
+        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_id, instruction);
     }
 
     public void RequestStart(string name)
