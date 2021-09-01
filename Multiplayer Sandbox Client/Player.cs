@@ -2,14 +2,16 @@ using Godot;
 using System;
 
 //handles movement both for the local client and the dummies
-public class Player : KinematicBody2D
+public class Player : Node2D
 {
-    Network network;
-
+    //network stuff
     public Vector2 received_net_pos; //last position received from the server
 
-    private const float net_interpolation_speed = 20;
-    private const float net_rate_hz = 60;
+    private Network network;
+
+    [Export] private float net_interpolation_speed = 50;
+    [Export] private float net_rate_hz = 60;
+
     private float net_cooldown = 0;
     private float last_input_data = -1;
 
@@ -25,7 +27,6 @@ public class Player : KinematicBody2D
 
         if (IsNetworkMaster() == false)
             return;
-
 
         if(net_cooldown < 1.0f / net_rate_hz)
         {

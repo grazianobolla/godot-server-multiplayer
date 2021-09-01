@@ -6,7 +6,7 @@ public class Network : Node
 {
     [Export] int server_port = 3074;
     [Export] int max_players = 6;
-    [Export] float net_rate_hz = 60;
+    [Export] float net_rate_hz = 30;
     [Export] PackedScene player_model;
 
     //player id/data dictionary
@@ -62,7 +62,9 @@ public class Network : Node
                 RpcId(id, "DeleteDummy", disconnected_client_id);
         }
 
+        clients[disconnected_client_id].QueueFree();
         clients.Remove(disconnected_client_id);
+
         GD.Print($"client {disconnected_client_id} disconnected!");
     }
 
