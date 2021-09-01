@@ -10,7 +10,7 @@ public class Network : Node
     [Export] PackedScene player_model;
 
     //player id/data dictionary
-    Dictionary<int, Player> clients = new Dictionary<int, Player>();
+    Dictionary<int, Player> players = new Dictionary<int, Player>();
 
     private float net_cooldown = 0;
     
@@ -24,17 +24,25 @@ public class Network : Node
     public override void _Process(float delta)
     {
         //broadcasts game state
-        if (net_cooldown < 1.0f / net_rate_hz)
-        {
-            net_cooldown += delta;
+        if (!ReadyToSend(delta))
             return;
-        }
-        else net_cooldown = 0;
 
-        foreach (var entry in clients)
+        foreach (var entry in players)
         {
             RpcUnreliable("UpdateDummyPosition", entry.Key, entry.Value.Position);
         }
+    }
+
+    private bool ReadyToSend(float delta)
+    {
+        if (net_cooldown < 1.0f / net_rate_hz)
+        {
+            net_cooldown += delta;
+            return false;
+        }
+        else net_cooldown = 0;
+
+        return true;
     }
 
     private void CreateServer()
@@ -46,24 +54,22 @@ public class Network : Node
         GD.Print("server listening on 3074");
     }
 
-    //called when a client connects the server
     private void OnNetworkClientConnect(int connected_client_id)
     {
         GD.Print($"client {connected_client_id} connected");
     }
 
-    //called when a client disconnects
     private void OnNetworkClientDisconnect(int disconnected_client_id)
     {
         //send delete call on all clients
-        foreach (int id in clients.Keys)
+        foreach (int id in players.Keys)
         {
             if (disconnected_client_id != id)
                 RpcId(id, "DeleteDummy", disconnected_client_id);
         }
 
-        clients[disconnected_client_id].QueueFree();
-        clients.Remove(disconnected_client_id);
+        players[disconnected_client_id].QueueFree();
+        players.Remove(disconnected_client_id);
 
         GD.Print($"client {disconnected_client_id} disconnected!");
     }
@@ -74,32 +80,27 @@ public class Network : Node
         GD.Print($"client {client_id} ({name}) requested start");
 
         Player client = player_model.Instance() as Player;
-        this.AddChild(client);
+        GetNode("/root/Scene").AddChild(client);
         
         client.name = name;
         client.Position = new Vector2(0,0);
 
         //spawn the client on all already connected clients
-        foreach (int id in clients.Keys)
-        {
-            RpcId(id, "SpawnDummy", client_id, client.name, client.Position);
-        }
-
-        RpcId(client_id, "Spawn", client.name, client.Position);
+        Rpc("SpawnDummy", client_id, client.name, client.Position);
 
         //spawn connected clients on his side
-        foreach (var item in clients)
+        foreach (var player in players)
         {
-            RpcId(client_id, "SpawnDummy", item.Key, item.Value.name, item.Value.Position);
+            RpcId(client_id, "SpawnDummy", player.Key, player.Value.name, player.Value.Position);
         }
 
-        clients.Add(client_id, client); //add to the server dictionary
+        players.Add(client_id, client); //add to the server dictionary
     }
 
     [Remote]
     private void ProcessClientMovementInstruction(int id, int instruction)
     {
-        Player client = clients[id];
+        Player client = players[id];
 
         if(client == null)
             return;

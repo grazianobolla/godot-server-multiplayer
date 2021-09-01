@@ -14,7 +14,6 @@ public class Network : Node
 
         //client godot-api signals
         GetTree().Connect("connected_to_server", this, "OnConnection");
-        GetTree().Connect("connection_failed", this, "OnConnectionFailed");
     }
 
     //creates a peer and attempts to connect a server
@@ -33,26 +32,12 @@ public class Network : Node
         GD.Print("connected to server!");
         unique_id = GetTree().GetNetworkUniqueId();
     }
-
-    //called on connection fail
-    private void OnConnectionFailed()
-    {
-        GD.Print("couldn't connect server!");
-    }
-
-    //spawns the player
-    [Remote]
-    private void Spawn(string name, Vector2 position)
-    {
-        GD.Print($"spawning player name {name}, position {position}");
-        game_singleton.AddModel(unique_id, name, position);
-    }
-
+    
     //spawns a dummy player
     [Remote]
     private void SpawnDummy(int id, string name, Vector2 position)
     {
-        GD.Print($"spawning dummy id {id}, name {name}, position {position}");
+        GD.Print($"spawning player id {id}, name {name}, position {position}");
         game_singleton.AddModel(id, name, position);
     }
 
@@ -71,7 +56,6 @@ public class Network : Node
         game_singleton.MoveModel(id, new_position);
     }
 
-    //used to send player instructions to the server
     public void SendClientMovementInstructions(int instruction)
     {
         RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_id, instruction);

@@ -5,7 +5,6 @@
 
 [node name="Player" type="Node2D"]
 script = ExtResource( 2 )
-net_interpolation_speed = 30.0
 
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 2, 2 )

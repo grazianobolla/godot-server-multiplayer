@@ -15,13 +15,17 @@ _global_script_class_icons={
 [application]
 
 config/name="Multiplayer Sandbox Server"
-run/main_scene="res://Server.tscn"
+run/main_scene="res://Scene.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Network="*res://Network.tscn"
 
 [display]
 
-window/size/width=1280
-window/size/height=720
+window/size/width=700
+window/size/height=400
 window/vsync/use_vsync=false
 
 [rendering]

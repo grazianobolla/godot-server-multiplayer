@@ -23,7 +23,7 @@ public class Game : Node
 
 		//add player to dictionary
 		dummy_clients.Add(id, player.GetInstanceId());
-		GD.Print($"Registered player {id} path {player.GetPath()}");
+		GD.Print($"registered player {id} path {player.GetPath()}");
 	}
 
 	//returns the player from the dictionary based on id (its a macro)
