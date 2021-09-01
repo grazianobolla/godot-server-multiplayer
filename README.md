@@ -16,7 +16,4 @@ To solve some of those problems a client-server architecture is needed, where th
 
 ![P2P vs Server Based](https://sites.google.com/site/cis3347cruzguzman014/_/rsrc/1480320465440/module-2/client-server-and-peer-to-peer-networking/p2p-network-vs-server.jpg?height=206&width=400 "P2P vs Server Based")
 
-### This implementation
-This implementation of the Client-Server architecture isn't ideal, it works ok but the clients are doing too much, remember that in a Server based architecture the client is just a representation of some server value, for example one improvement would be to do all the physics on the server, and just send the results to the client, but for a simple party game, or like in this case, an example, its fine.
-
 #### Contact on Discord Raz#4584
