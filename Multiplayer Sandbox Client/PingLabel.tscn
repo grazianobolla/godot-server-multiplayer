@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://PingCalculator.cs" type="Script" id=1]
+
+[node name="PingLabel" type="Label"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -31.5
+margin_right = 31.5
+margin_bottom = 14.0
+text = "Ping: 0ms"
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="OnTimerTimeout"]

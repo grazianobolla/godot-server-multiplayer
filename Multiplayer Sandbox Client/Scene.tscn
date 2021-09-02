@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Lobby.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Lobby.cs" type="Script" id=1]
+[ext_resource path="res://PingLabel.tscn" type="PackedScene" id=2]
 
 [node name="Scene" type="Node2D"]
 
@@ -13,6 +14,8 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="PingLabel" parent="Control" instance=ExtResource( 2 )]
 
 [node name="UsernameInput" type="LineEdit" parent="Control"]
 margin_right = 112.0

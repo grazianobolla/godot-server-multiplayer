@@ -13,10 +13,7 @@ public class Game : Node
 		
 		//configure model
 		Player player = (Player)player_scene.Instance();
-		player.Name = id.ToString(); //node name
-		player.ChangeName(name); //label name
-		player.Position = position;
-		player.SetNetworkMaster(id);
+		player.Setup(id, name, position);
 
 		//add to scene
 		GetTree().Root.GetNode("Scene/Clients").AddChild(player);
@@ -39,6 +36,6 @@ public class Game : Node
 
 	//updates position value on a dummy
 	public void MoveModel(int id, Vector2 position){
-		GetModel(id).received_net_pos = position;
+		GetModel(id).UpdatePosition(position);
 	}
 }

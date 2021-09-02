@@ -4,8 +4,12 @@ using System;
 //networking class, has to be the same name as the one in the server
 public class Network : Node
 {
+    [Signal] public delegate void ReceivedPing();
+
+    public bool isConnected = false;
+
     Game game_singleton;
-    int unique_id;
+    int unique_local_id = -1;
 
     public override void _Ready()
     {
@@ -14,6 +18,7 @@ public class Network : Node
 
         //client godot-api signals
         GetTree().Connect("connected_to_server", this, "OnConnection");
+        GetTree().Connect("server_disconnected", this, "OnDisconnection");
     }
 
     //creates a peer and attempts to connect a server
@@ -30,7 +35,13 @@ public class Network : Node
     private void OnConnection()
     {
         GD.Print("connected to server!");
-        unique_id = GetTree().GetNetworkUniqueId();
+        unique_local_id = GetTree().GetNetworkUniqueId();
+        isConnected = true;
+    }
+    
+    private void OnDisconnection()
+    {
+        isConnected = false;
     }
     
     //spawns a dummy player
@@ -58,11 +69,22 @@ public class Network : Node
 
     public void SendClientMovementInstructions(int instruction)
     {
-        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_id, instruction);
+        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_local_id, instruction);
     }
 
     public void RequestStart(string name)
     {
-        RpcId(1, "StartClient", unique_id, name);
+        RpcId(1, "StartClient", unique_local_id, name);
+    }
+
+    public void CalculateLatency()
+    {
+        RpcId(1, "RequestPing", unique_local_id);
+    }
+
+    [Remote]
+    private void ReceivePing()
+    {
+        EmitSignal(nameof(ReceivedPing));
     }
 }

@@ -107,4 +107,10 @@ public class Network : Node
 
         client.movement_instructions = instruction;
     }
+
+    [Remote]
+    private void RequestPing(int id)
+    {
+        RpcId(id, "ReceivePing");
+    }
 }

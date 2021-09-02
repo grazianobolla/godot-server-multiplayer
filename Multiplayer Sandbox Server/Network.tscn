@@ -5,5 +5,4 @@
 
 [node name="Network" type="Node"]
 script = ExtResource( 1 )
-net_rate_hz = 60.0
 player_model = ExtResource( 2 )

@@ -2,33 +2,42 @@ using Godot;
 using System;
 
 //handles movement both for the local client and the dummies
-public class Player : Node2D
+public class PlayerMovement : Node
 {
-    public Vector2 received_net_pos; //the last position received from the server
+    //the last position received from the server
+    public Vector2 received_net_pos;
 
+    [Export] private bool enable_interpolation = true;
+
+    //speed of the movement interpolation
     [Export] private float net_interpolation_speed = 50;
 
     //the rate in hz at which information about movement is sent to the server
     [Export] private float net_rate_hz = 60;
 
-    private Network network;
     private float net_cooldown = 0;
     private float last_input_data = -1;
+    private Network network;
+
+    //logic
+    private Node2D player_node;
 
     public override void _Ready()
     {
         network = GetNode("/root/Network") as Network;
+        player_node = GetParent() as Node2D;
     }
 
     public override void _Process(float delta)
     {
         //interpolates to the last server received position for a smoother movement
-        Position = Position.LinearInterpolate(received_net_pos, delta * net_interpolation_speed);
-
-        if (IsNetworkMaster() == false || ReadyToSend(delta) == false)
-            return;
-
-        SendInputData(delta);
+        if (enable_interpolation)
+            player_node.Position = player_node.Position.LinearInterpolate(received_net_pos, delta * net_interpolation_speed);
+        else
+            player_node.Position = received_net_pos;
+            
+        if (ReadyToSend(delta) == true && IsNetworkMaster() == true)
+            SendInputData(delta);
     }
 
     public void ChangeName(string name)
