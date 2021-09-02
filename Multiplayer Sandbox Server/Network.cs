@@ -12,37 +12,21 @@ public class Network : Node
     //player id/data dictionary
     Dictionary<int, Player> players = new Dictionary<int, Player>();
 
-    private float net_cooldown = 0;
-    
     public override void _Ready()
     {
         CreateServer();
         GetTree().Connect("network_peer_connected", this, "OnNetworkClientConnect");
         GetTree().Connect("network_peer_disconnected", this, "OnNetworkClientDisconnect");
+
+        GetNode<Timer>("Timer").WaitTime = 1.0f / net_rate_hz;
     }
 
-    public override void _Process(float delta)
+    private void OnTimerOut()
     {
-        //broadcasts game state
-        if (!ReadyToSend(delta))
-            return;
-
         foreach (var entry in players)
         {
             RpcUnreliable("UpdateDummyPosition", entry.Key, entry.Value.Position);
         }
-    }
-
-    private bool ReadyToSend(float delta)
-    {
-        if (net_cooldown < 1.0f / net_rate_hz)
-        {
-            net_cooldown += delta;
-            return false;
-        }
-        else net_cooldown = 0;
-
-        return true;
     }
 
     private void CreateServer()

@@ -1,19 +1,20 @@
 using Godot;
 using System;
 
-//networking class, has to be the same name as the one in the server
+//networking class,
+//has to be the same name as the one in the server
+//due to how Godot RPC and Networking works
+
 public class Network : Node
 {
     [Signal] public delegate void ReceivedPing();
-
     public bool isConnected = false;
 
-    Game game_singleton;
-    int unique_local_id = -1;
+    private Game game_singleton;
+    private int unique_local_id = -1;
 
     public override void _Ready()
     {
-        //game singleton
         game_singleton = GetNode<Game>("/root/Game");
 
         //client godot-api signals
@@ -39,6 +40,7 @@ public class Network : Node
         isConnected = true;
     }
     
+    //called when this client looses connection
     private void OnDisconnection()
     {
         isConnected = false;
