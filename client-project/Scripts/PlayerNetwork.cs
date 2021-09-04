@@ -8,7 +8,7 @@ public class PlayerNetwork : Node
     
     //the rate in hz at which information about movement is sent to the server
     [Export] private float net_rate_hz = 30;
-    private float last_input_data = -1;
+    private byte last_instruction = 0;
 
     public override void _Ready()
     {
@@ -24,36 +24,45 @@ public class PlayerNetwork : Node
 
     private void SendInputData()
     {
-        int input = ReadInput();
+        byte instruction = ReadInput();
 
-        if(input != last_input_data)
-            network.SendClientMovementInstructions(input);
+        if(instruction != last_instruction)
+            network.SendClientMovementInstructions(instruction);
 
-        last_input_data = input;
+        last_instruction = instruction;
     }
 
-    private int ReadInput()
+    private byte ReadInput()
     {
         /*
-        For a proper game, you should probably send just 1 byte,
-        and encode the movement there, since it required a more
-        complex code on the server side, I left it as this.
+            1 byte = 8 bits
+            0 0 0 0 0 0 0 0
+            we have 8 places to encode our input,
+            we will use the first 4 bits
         */
         
-        int input_data = -1;
+        byte input = 0;
 
         if (Input.IsActionPressed("ui_right"))
-            input_data = 0;
+        {
+            input ^= (1 << 0);
+        }
 
         else if (Input.IsActionPressed("ui_left"))
-            input_data = 1;
+        {
+            input ^= (1 << 1);
+        }
 
         if (Input.IsActionPressed("ui_up"))
-            input_data = 2;
+        {
+            input ^= (1 << 2);
+        }
 
         else if (Input.IsActionPressed("ui_down"))
-            input_data = 3;
+        {
+            input ^= (1 << 3);
+        }
 
-        return input_data;
+        return input;
     }
 }

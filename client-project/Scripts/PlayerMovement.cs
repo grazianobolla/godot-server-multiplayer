@@ -33,6 +33,6 @@ public class PlayerMovement : Node2D
     //it helps visualize interpolation or client / side prediction.
     public override void _Draw()
     {
-        DrawCircle(received_net_pos - GlobalPosition, 12, new Color(1,0,1));
+        DrawCircle(received_net_pos - GlobalPosition, 8, new Color(1,0,1));
     }
 }

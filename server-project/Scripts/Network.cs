@@ -82,14 +82,14 @@ public class Network : Node
     }
 
     [Remote]
-    private void ProcessClientMovementInstruction(int id, int instruction)
+    private void ProcessClientMovementInstruction(int id, byte instruction)
     {
         Player client = players[id];
 
         if(client == null)
             return;
 
-        client.movement_instructions = instruction;
+        client.received_instruction = instruction;
     }
 
     [Remote]

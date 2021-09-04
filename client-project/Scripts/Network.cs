@@ -69,7 +69,7 @@ public class Network : Node
         game_singleton.MoveModel(id, new_position);
     }
 
-    public void SendClientMovementInstructions(int instruction)
+    public void SendClientMovementInstructions(byte instruction)
     {
         RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_local_id, instruction);
     }
