@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scripts/Network.cs" type="Script" id=1]
-[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scripts/Network.cs" type="Script" id=1]
+[ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
 
 [node name="Network" type="Node"]
 script = ExtResource( 1 )

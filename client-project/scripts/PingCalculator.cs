@@ -18,8 +18,8 @@ public class PingCalculator : Label
         if (network.isConnected == false)
             return;
             
-        network.CalculateLatency();
         time = OS.GetTicksMsec();
+        network.CalculateLatency();
     }
 
     private void OnReceivedPing()

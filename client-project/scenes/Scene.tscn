@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scripts/Lobby.cs" type="Script" id=1]
-[ext_resource path="res://Scenes/PingLabel.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scripts/Lobby.cs" type="Script" id=1]
+[ext_resource path="res://scenes/PingLabel.tscn" type="PackedScene" id=2]
 
 [node name="Scene" type="Node2D"]
 

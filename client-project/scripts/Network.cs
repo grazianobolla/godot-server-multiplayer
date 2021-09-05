@@ -7,15 +7,17 @@ using System;
 
 public class Network : Node
 {
-    [Signal] public delegate void ReceivedPing();
+    [Signal]
+    public delegate void ReceivedPing();
+    
     public bool isConnected = false;
 
-    private Game game_singleton;
+    private Game game;
     private int unique_local_id = -1;
 
     public override void _Ready()
     {
-        game_singleton = GetNode<Game>("/root/Game");
+        game = GetNode<Game>("/root/Game");
 
         //client godot-api signals
         GetTree().Connect("connected_to_server", this, "OnConnection");
@@ -51,7 +53,7 @@ public class Network : Node
     private void SpawnDummy(int id, string name, Vector2 position)
     {
         GD.Print($"spawning player id {id}, name {name}, position {position}");
-        game_singleton.AddModel(id, name, position);
+        game.AddModel(id, name, position);
     }
 
     //removes a dummy
@@ -59,14 +61,14 @@ public class Network : Node
     private void DeleteDummy(int id)
     {
         GD.Print($"removing dummy id {id}");
-        game_singleton.DeleteModel(id);
+        game.DeleteModel(id);
     }
 
     //changes the position of a dummy
     [Remote]
     private void UpdateDummyPosition(int id, Vector2 new_position)
     {
-        game_singleton.MoveModel(id, new_position);
+        game.MoveModel(id, new_position);
     }
 
     public void SendClientMovementInstructions(byte instruction)

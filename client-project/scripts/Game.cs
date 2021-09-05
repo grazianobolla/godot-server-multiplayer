@@ -18,7 +18,7 @@ public class Game : Node
 
 	//adds a player model to the scene
 	public void AddModel(int id, string name, Vector2 position){
-		PackedScene player_scene = (PackedScene)ResourceLoader.Load("res://Scenes/Player.tscn");
+		PackedScene player_scene = (PackedScene)ResourceLoader.Load("res://scenes/Player.tscn");
 		
 		//configure model
 		Player player = (Player)player_scene.Instance();
