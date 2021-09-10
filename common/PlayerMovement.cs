@@ -3,7 +3,12 @@ using System;
 
 public static class PlayerMovement
 {
-    public const float SPEED = 300;
+    public const float max_speed = 300;
+
+    public static Vector2 Movement(byte instruction, float delta)
+    {
+        return ProcessMovement(instruction) * max_speed * delta;
+    }
 
     //returns a byte with player input encoded on it
     public static byte ReadInput()

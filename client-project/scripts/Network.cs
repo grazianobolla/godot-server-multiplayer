@@ -66,14 +66,14 @@ public class Network : Node
 
     //changes the position of a dummy
     [Remote]
-    private void UpdateDummyPosition(int id, Vector2 new_position)
+    private void UpdateDummyPosition(int id, int tick, Vector2 position)
     {
-        game.MoveModel(id, new_position);
+        game.MoveModel(id, tick, position);
     }
 
-    public void SendClientMovementInstructions(byte instruction)
+    public void SendClientMovementInstructions(int tick, byte instruction)
     {
-        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_local_id, instruction);
+        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_local_id, tick, instruction);
     }
 
     public void RequestStart(string name)

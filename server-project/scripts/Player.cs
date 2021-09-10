@@ -4,13 +4,24 @@ using System;
 public class Player : KinematicBody2D
 {
     public string name = "null_name";
-    public byte received_instruction = 0;
+    public int net_id = 0;
 
-    private Vector2 velocity = Vector2.Zero;
+    private byte received_instruction = 0;
+    private Network network;
+
+    public override void _Ready()
+    {
+        network = GetNode("/root/Network") as Network;
+    }
 
     public override void _Process(float delta)
     {
-        Vector2 dir = PlayerMovement.ProcessMovement(received_instruction);
-        velocity = MoveAndSlide(dir * PlayerMovement.SPEED, Vector2.Up);
+        Position += PlayerMovement.Movement(received_instruction, delta);
+    }
+
+    public void ProcessMovementRequest(int tick, byte instruction)
+    {
+        received_instruction = instruction;
+        network.SendUpdatePosition(net_id, tick, Position);
     }
 }

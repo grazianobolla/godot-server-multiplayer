@@ -5,6 +5,7 @@
 
 [node name="Player" type="Node2D"]
 script = ExtResource( 2 )
+net_rate_hz = 60.0
 
 [node name="Timer" type="Timer" parent="."]
 autostart = true

@@ -6,7 +6,6 @@ public class Network : Node
 {
     [Export] int server_port = 3074;
     [Export] int max_players = 6;
-    [Export] float net_rate_hz = 30;
     [Export] PackedScene player_model;
 
     //player id/data dictionary
@@ -17,16 +16,11 @@ public class Network : Node
         CreateServer();
         GetTree().Connect("network_peer_connected", this, "OnNetworkClientConnect");
         GetTree().Connect("network_peer_disconnected", this, "OnNetworkClientDisconnect");
-
-        GetNode<Timer>("Timer").WaitTime = 1.0f / net_rate_hz;
     }
 
-    private void OnTimerOut()
+    public void SendUpdatePosition(int id, int tick, Vector2 position)
     {
-        foreach (var entry in players)
-        {
-            RpcUnreliable("UpdateDummyPosition", entry.Key, entry.Value.Position);
-        }
+        RpcUnreliable("UpdateDummyPosition", id, tick, position);
     }
 
     private void CreateServer()
@@ -67,6 +61,7 @@ public class Network : Node
         GetNode("/root/Scene").AddChild(client);
         
         client.name = name;
+        client.net_id = client_id;
         client.Position = new Vector2(0,0);
 
         //spawn the client on all already connected clients
@@ -82,14 +77,14 @@ public class Network : Node
     }
 
     [Remote]
-    private void ProcessClientMovementInstruction(int id, byte instruction)
+    private void ProcessClientMovementInstruction(int id, int tick, byte instruction)
     {
         Player client = players[id];
 
         if(client == null)
             return;
 
-        client.received_instruction = instruction;
+        client.ProcessMovementRequest(tick, instruction);
     }
 
     [Remote]

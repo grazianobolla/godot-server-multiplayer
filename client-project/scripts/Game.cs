@@ -44,7 +44,7 @@ public class Game : Node
 	}
 
 	//updates position value on a dummy
-	public void MoveModel(int id, Vector2 position){
-		GetModel(id).UpdatePosition(position);
+	public void MoveModel(int id, int tick, Vector2 position){
+		GetModel(id).UpdatePosition(tick, position);
 	}
 }
