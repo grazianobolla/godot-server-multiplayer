@@ -6,6 +6,9 @@ Godot Multiplayer Demo using the Client Server Architecture
 ## What it is
 This example demonstrates how to implement a client-server architecture in Godot using `NetworkMultiplayerENet` and the `Rpc` calls, this can work as a base for a proper game or just to learn how to create a multiplayer game using Godot Network API. It includes client side prediction and interpolation techniques.
 
+_(it just looks laggy on the gif)_
+![Example](https://i.imgur.com/ZgoVLSV.gif)
+
 ## Client Server Architecture
 Normally Godot multiplayer examples show a Peer to Peer architecture, where all clients are interconnected, and where they can freely communicate with each other, for me, it's easier to implement and prototype, but also this in general and specially in Godot is a mess, besides it having many drawbacks.
 
