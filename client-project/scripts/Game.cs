@@ -17,7 +17,8 @@ public class Game : Node
 	Dictionary<int, ulong> dummy_clients = new Dictionary<int, ulong>();
 
 	//adds a player model to the scene
-	public void AddModel(int id, string name, Vector2 position){
+	public void AddModel(int id, string name, Vector2 position)
+	{
 		PackedScene player_scene = (PackedScene)ResourceLoader.Load("res://scenes/Player.tscn");
 		
 		//configure model
@@ -33,18 +34,34 @@ public class Game : Node
 	}
 
 	//returns the player from the dictionary based on id (its a macro)
-	Player GetModel(int id){
-		return (Player)GD.InstanceFromId(dummy_clients[id]);
+	private Player GetModel(int id)
+	{
+		if (dummy_clients.ContainsKey(id))
+			return (Player)GD.InstanceFromId(dummy_clients[id]);
+
+		return null;	
 	}
 
 	//deletes a player
-	public void DeleteModel(int id){
-		GetModel(id).QueueFree();
+	public void DeleteModel(int id)
+	{
+		Player player = GetModel(id);
+
+		if(player == null)
+			return;
+
+		player.QueueFree();
 		dummy_clients.Remove(id);
 	}
 
 	//updates position value on a dummy
-	public void MoveModel(int id, int tick, Vector2 position){
-		GetModel(id).UpdatePosition(tick, position);
+	public void MoveModel(int id, uint tick, Vector2 position)
+	{
+		Player player = GetModel(id);
+
+		if(player == null)
+			return;
+
+		player.UpdatePosition(tick, position);
 	}
 }

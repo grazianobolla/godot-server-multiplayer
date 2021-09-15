@@ -7,6 +7,16 @@
 
 [node name="Clients" type="Node" parent="."]
 
+[node name="Control2" type="Control" parent="."]
+margin_right = 700.0
+margin_bottom = 400.0
+__meta__ = {
+"_edit_use_anchors_": false,
+"_editor_description_": ""
+}
+
+[node name="PingLabel" parent="Control2" instance=ExtResource( 2 )]
+
 [node name="Control" type="Control" parent="."]
 margin_right = 700.0
 margin_bottom = 400.0
@@ -15,16 +25,27 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PingLabel" parent="Control" instance=ExtResource( 2 )]
-
 [node name="UsernameInput" type="LineEdit" parent="Control"]
 margin_right = 112.0
 margin_bottom = 24.0
 placeholder_text = "username"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AddressInput" type="LineEdit" parent="Control"]
+margin_left = 112.0
+margin_right = 224.0
+margin_bottom = 24.0
+text = "localhost"
+placeholder_text = "address"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ConnectButton" type="Button" parent="Control"]
-margin_left = 117.0
-margin_right = 187.0
+margin_left = 224.0
+margin_right = 294.0
 margin_bottom = 24.0
 text = "Connect"
 __meta__ = {

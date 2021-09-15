@@ -1,19 +1,21 @@
 using Godot;
 using System;
 
-//networking class,
-//has to be the same name as the one in the server
-//due to how Godot RPC and Networking works
+/*
+    Networking Class,
+    for client-side prediction to work, it needs packages to arrieve in order,
+    I couldn't come up with a way to use UDP (RpcUnreliable) packets for it
+    so I switched to TCP, but there is probably a way to do it, just not as simple.
+*/
 
 public class Network : Node
 {
     [Signal]
     public delegate void ReceivedPing();
-    
     public bool isConnected = false;
 
     private Game game;
-    private int unique_local_id = -1;
+    private int net_id = -1;
 
     public override void _Ready()
     {
@@ -38,7 +40,7 @@ public class Network : Node
     private void OnConnection()
     {
         GD.Print("connected to server!");
-        unique_local_id = GetTree().GetNetworkUniqueId();
+        net_id = GetTree().GetNetworkUniqueId();
         isConnected = true;
     }
     
@@ -66,29 +68,29 @@ public class Network : Node
 
     //changes the position of a dummy
     [Remote]
-    private void UpdateDummyPosition(int id, int tick, Vector2 position)
+    private void UpdateDummyPosition(int id, uint tick, Vector2 position)
     {
         game.MoveModel(id, tick, position);
-    }
-
-    public void SendClientMovementInstructions(int tick, byte instruction)
-    {
-        RpcUnreliableId(1, "ProcessClientMovementInstruction", unique_local_id, tick, instruction);
-    }
-
-    public void RequestStart(string name)
-    {
-        RpcId(1, "StartClient", unique_local_id, name);
-    }
-
-    public void CalculateLatency()
-    {
-        RpcId(1, "RequestPing", unique_local_id);
     }
 
     [Remote]
     private void ReceivePing()
     {
         EmitSignal(nameof(ReceivedPing));
+    }
+
+    public void SendClientMovementInstructions(uint tick, byte instruction)
+    {
+        RpcId(1, "ProcessClientMovementInstruction", net_id, tick, instruction);
+    }
+
+    public void RequestStart(string name)
+    {
+        RpcId(1, "StartClient", net_id, name);
+    }
+
+    public void CalculateLatency()
+    {
+        RpcId(1, "RequestPing", net_id);
     }
 }

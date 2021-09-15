@@ -18,11 +18,6 @@ public class Network : Node
         GetTree().Connect("network_peer_disconnected", this, "OnNetworkClientDisconnect");
     }
 
-    public void SendUpdatePosition(int id, int tick, Vector2 position)
-    {
-        RpcUnreliable("UpdateDummyPosition", id, tick, position);
-    }
-
     private void CreateServer()
     {
         NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
@@ -52,6 +47,11 @@ public class Network : Node
         GD.Print($"client {disconnected_client_id} disconnected!");
     }
 
+    public void SendUpdatePosition(int id, uint tick, Vector2 position)
+    {
+        Rpc("UpdateDummyPosition", id, tick, position);
+    }
+
     [Remote]
     private void StartClient(int client_id, string name)
     {
@@ -59,25 +59,25 @@ public class Network : Node
 
         Player client = player_model.Instance() as Player;
         GetNode("/root/Scene").AddChild(client);
-        
-        client.name = name;
-        client.net_id = client_id;
-        client.Position = new Vector2(0,0);
+
+        //configure client        
+        client.Setup(client_id, name, Vector2.Zero);
 
         //spawn the client on all already connected clients
-        Rpc("SpawnDummy", client_id, client.name, client.Position);
+        Rpc("SpawnDummy", client_id, client.username, client.Position);
 
         //spawn connected clients on his side
-        foreach (var player in players)
+        foreach (var entry in players)
         {
-            RpcId(client_id, "SpawnDummy", player.Key, player.Value.name, player.Value.Position);
+            var player = entry.Value;
+            RpcId(client_id, "SpawnDummy", entry.Key, player.username, player.Position);
         }
 
         players.Add(client_id, client); //add to the server dictionary
     }
 
     [Remote]
-    private void ProcessClientMovementInstruction(int id, int tick, byte instruction)
+    private void ProcessClientMovementInstruction(int id, uint tick, byte instruction)
     {
         Player client = players[id];
 

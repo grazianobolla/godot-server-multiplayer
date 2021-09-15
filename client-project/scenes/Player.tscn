@@ -5,10 +5,6 @@
 
 [node name="Player" type="Node2D"]
 script = ExtResource( 2 )
-net_rate_hz = 60.0
-
-[node name="Timer" type="Timer" parent="."]
-autostart = true
 
 [node name="UsernameLabel" type="Label" parent="."]
 anchor_left = 0.5
@@ -26,4 +22,13 @@ scale = Vector2( 2, 2 )
 z_index = -1
 texture = ExtResource( 1 )
 
-[connection signal="timeout" from="Timer" to="." method="OnTimerOut"]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_top = -14.0
+margin_right = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
