@@ -80,7 +80,7 @@ public class Player : Node2D
         Vector2 prediction = position;
         //we take the received position and apply all the yet-non processed inputs
         foreach(var instr in instructions)
-            if(instr.tick >= tick)
+            if(instr.tick > tick)
                 prediction += PlayerMovement.Movement(instr.data, 1.0f / 60.0f); //aprox delta
 
         instructions.RemoveAll (i => (i.tick <= tick)); //delete the used inputs
