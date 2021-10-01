@@ -13,6 +13,8 @@ public class Player : KinematicBody2D
         network = GetNode("/root/Network") as Network;
     }
 
+    //this is called when we receive a request from a client,
+    //we process the movement and send back a response
     public void ProcessMovementRequest(uint tick, byte instruction)
     {
         float delta = GetPhysicsProcessDeltaTime();

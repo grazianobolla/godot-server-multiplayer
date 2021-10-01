@@ -79,6 +79,7 @@ public class Network : Node
         EmitSignal(nameof(ReceivedPing));
     }
 
+    //sends input information to the server for processing
     public void SendClientMovementInstructions(uint tick, byte instruction)
     {
         RpcId(1, "ProcessClientMovementInstruction", net_id, tick, instruction);

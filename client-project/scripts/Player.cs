@@ -55,6 +55,7 @@ public class Player : Node2D
     private void ProcessClientInput(float delta)
     {
         uint current_tick = OS.GetTicksMsec();
+
         //read input and save to history
         byte instruction = PlayerMovement.ReadInput();
         instructions.Add(new Instruction {tick = current_tick, data = instruction});
@@ -65,6 +66,7 @@ public class Player : Node2D
         //predict the input
         Position += PlayerMovement.Movement(instruction, delta);
     }
+    
     //called when the client receives a new position update from the server
     public void UpdatePosition(uint tick, Vector2 position)
     {
